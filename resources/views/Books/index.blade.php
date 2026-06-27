@@ -86,10 +86,9 @@
                 </p>
 
                 <div class="flex items-center justify-between text-sm">
-
-                <span class="text-yellow-600 font-semibold">
-                    ⭐ {{ number_format($book->reviews_avg_rating, 1) }}
-                </span>
+                    <div class="flex">
+                        <x-star-rating :rating="$book->reviews_avg_rating" />
+                    </div>
 
                     <span class="text-gray-500">
                     📝 {{ $book->reviews_count }} Reviews

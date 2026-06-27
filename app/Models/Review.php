@@ -17,6 +17,22 @@ class Review extends Model
         return $this->belongsTo(Book::class);
     }
 
+    protected static function booted(){
+
+        static::created(function (Review $review) {
+            cache()->forget("book:{$review->book_id}");
+        });
+        static::updated(function (Review $review) {
+            cache()->forget("book:{$review->book_id}");
+        });
+        static::deleted(function (Review $review) {
+            cache()->forget("book:{$review->book_id}");
+        });
+
+
+
+
+    }
 
 }
 

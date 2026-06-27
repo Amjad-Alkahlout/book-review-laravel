@@ -20,10 +20,7 @@
             <div class="flex items-center gap-6 mt-5 text-sm">
 
                 <div class="flex items-center gap-2">
-                    <span class="text-yellow-500 text-lg">⭐</span>
-                    <span class="font-medium text-gray-700">
-                {{ number_format($book->reviews_avg_rating, 1) }}/5
-            </span>
+                    <x-star-rating :rating="$book->reviews_avg_rating" />
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -62,23 +59,7 @@
 
                     <div class="flex justify-between items-center mb-4">
 
-                        <div class="flex items-center gap-1">
-
-                            @for($i = 1; $i <= 5; $i++)
-
-                                @if($i <= $review->rating)
-
-                                    <span class="text-yellow-400">★</span>
-
-                                @else
-
-                                    <span class="text-gray-300">★</span>
-
-                                @endif
-
-                            @endfor
-
-                        </div>
+                        <x-star-rating :rating="$review->rating" />
 
                         <span class="text-sm text-gray-400">
             {{ $review->created_at->format('M d, Y') }}

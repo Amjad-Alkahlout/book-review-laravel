@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class BookController extends Controller
 {
@@ -13,14 +14,17 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
+
         $filter = $request->input('filter', '');
         $title = $request->input('title');
-
+        $page = $request->input('page', 1);
+        $cacheKey = "books-test:title={$title}:filter={$filter}:page={$page}";
         $books = Book::query();
+            if ($title) {
+                $books->search($title);
+            }
 
-        if ($title) {
-            $books->search($title);
-        }
+
 
         $books = match ($filter) {
             'popular_last_month' =>
@@ -38,9 +42,7 @@ class BookController extends Controller
             default =>
             $books->latestBooks()
         };
-
-        $books = $books->paginate(10);
-
+        $books = Cache::remember($cacheKey, 3600, fn () => $books->paginate(10));
         return view('books.index', compact('books'));
     }
 
@@ -66,12 +68,19 @@ class BookController extends Controller
      */
     public function show(string $id)
     {
-        $book=Book::with(['reviews'=>function ($query){
-            $query->orderBy('created_at', 'desc');
-        }])->withCount('reviews')
-            ->withAvg('reviews','rating')
-            ->findOrFail($id);
-        return view('books.show',['book'=>$book]);
+        $book = Cache::remember("book:{$id}", 3600, function () use ($id) {
+            return Book::with([
+                'reviews' => function ($query) {
+                    $query->orderByDesc('created_at');
+                }
+            ])
+                ->withCount('reviews')
+                ->withAvg('reviews', 'rating')
+                ->findOrFail($id);
+        });
+
+
+        return view('books.show', compact('book'));
     }
 
     /**
