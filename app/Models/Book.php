@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Book extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'rating',
+        'review',
+    ];
+
     public function reviews(){
 
         return $this->hasMany(Review::class);
